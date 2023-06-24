@@ -105,6 +105,17 @@ export default function Home() {
     await deleteDoc(doc(db, "todos", todo.id));
   };
 
+  //
+  const counter = () => {
+    if(cases === 'All'){
+      return <p className={style.count}>You have {filtered.length} todo{filtered.length > 1 && 's'}</p>
+    } else if(cases ==='Active'){
+      return <p className={style.count}>You have {filtered.length} active todo{filtered.length > 1 && 's'}</p>
+    } else if(cases === 'Completed'){
+      return <p className={style.count}>You have {filtered.length} completed todo{filtered.length > 1 && 's'} </p>
+    }
+  }
+
   const style = {
     bg: `h-screen w-screen p-4 bg-gradient-to-r from-[#2F80ED] to-[#1CB5E0]`,
     container: `bg-slate-100 max-w-[500px] w-full m-auto rounded-md shadow-xl p-4`,
@@ -153,11 +164,7 @@ export default function Home() {
             />
           ))}
         </ul>
-        {filtered.length < 1 ? (
-          <p className={style.count}>You have any todos</p>
-        ) : (
-          <p className={style.count}>You have {filtered.length} todos</p>
-        )}
+        {counter()}
         <div className="flex justify-center space-x-3">
           <button
             onClick={(e) => setCases(e.target.textContent)}
