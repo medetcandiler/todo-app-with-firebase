@@ -45,12 +45,14 @@ export default function Home() {
       return;
     }
     if (!selectedTodo?.onEdit) {
+      setInput("");
       await addDoc(collection(db, "todos"), {
         text: input,
         completed: false,
         onEdit: false,
       });
     } else {
+      setInput("");
       await updateDoc(doc(db, "todos", selectedTodo?.id), {
         text: input,
         onEdit: false,
@@ -60,7 +62,7 @@ export default function Home() {
         onEdit: false,
       }));
     }
-    setInput("");
+    
   };
 
   // read todo from firebase
