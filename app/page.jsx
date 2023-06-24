@@ -21,18 +21,18 @@ export default function Home() {
   const [isValidate, setIsValidate] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const editInput = useRef();
+  const [cases, setCases] = useState("All");
+  const [filtered, setFiltered ] = useState([]);
 
   // edit todo
-  const handleEdit = async (todo) => { 
-    await updateDoc(doc(db, 'todos', todo.id), {
+  const handleEdit = async (todo) => {
+    await updateDoc(doc(db, "todos", todo.id), {
       onEdit: !todo.onEdit,
-    })
-    setSelectedTodo({...todo, onEdit: !todo.onEdit});
+    });
+    setSelectedTodo({ ...todo, onEdit: !todo.onEdit });
 
-    editInput.current.focus()
+    editInput.current.focus();
   };
-
-
 
   // create todo
   const handleSubmit = async (e) => {
@@ -62,7 +62,6 @@ export default function Home() {
         onEdit: false,
       }));
     }
-    
   };
 
   // read todo from firebase
@@ -80,6 +79,19 @@ export default function Home() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+
+    if (cases === "All") {
+      setFiltered(todos); 
+    } else if (cases === "Active") {
+      const filtered = todos.filter(todo => !todo.completed)
+      setFiltered(filtered);
+    } else if (cases === "Completed") {
+      const filtered = todos.filter((todo) => todo.completed);
+      setFiltered(filtered);
+    }
+  }, [cases, todos]);
 
   // update todo in firebase
   const handleToggle = async (todo) => {
@@ -131,7 +143,7 @@ export default function Home() {
         </form>
         {isValidate && <ValidationMsg />}
         <ul>
-          {todos.map((todo) => (
+          {filtered.map((todo) => (
             <Todo
               key={todo.id}
               todo={todo}
@@ -141,11 +153,31 @@ export default function Home() {
             />
           ))}
         </ul>
-        {todos.length < 1 ? (
+        {filtered.length < 1 ? (
           <p className={style.count}>You have any todos</p>
         ) : (
-          <p className={style.count}>You have {todos.length} todos</p>
+          <p className={style.count}>You have {filtered.length} todos</p>
         )}
+        <div className="flex justify-center space-x-3">
+          <button
+            onClick={(e) => setCases(e.target.textContent)}
+            className="btn"
+          >
+            All
+          </button>
+          <button
+            onClick={(e) => setCases(e.target.textContent)}
+            className="btn"
+          >
+            Active
+          </button>
+          <button
+            onClick={(e) => setCases(e.target.textContent)}
+            className="btn"
+          >
+            Completed
+          </button>
+        </div>
       </div>
     </main>
   );

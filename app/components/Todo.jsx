@@ -17,7 +17,7 @@ const style = {
 
 function Todo({ todo, handleToggle, handleDelete, handleEdit }) {
   return (
-    <li className={todo.completed ? style.liComplete : style.li}>
+    <li className={(todo.completed || todo.onEdit) ? style.liComplete : style.li}>
       <div className={style.row}>
         <input
           className={style.checkbox}

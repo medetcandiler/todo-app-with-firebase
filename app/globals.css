@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components{
+  .btn{
+    @apply bg-purple-500 hover:opacity-50 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 p-2 text-white
+  }
+}
+
 .dot-spinner {
   --uib-size: 2.8rem;
   --uib-speed: .9s;
