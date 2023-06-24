@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { db } from "./firebase";
 import {
@@ -19,23 +19,53 @@ export default function Home() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
   const [isValidate, setIsValidate] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState(null);
+  const editInput = useRef();
+
+  useEffect(() => {
+    if (selectedTodo?.onEdit) {
+      editInput.current.focus();
+    }
+  }, [selectedTodo, setSelectedTodo]);
+
+  // edit todo
+  const handleEdit = async (todo) => {
+    await updateDoc(doc(db, "todos", todo.id), {
+      onEdit: !todo.onEdit,
+    });
+    setSelectedTodo({ ...todo, onEdit: !todo.onEdit });
+  };
+
 
   // create todo
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (input === "") {
       setIsValidate(true);
       setTimeout(() => {
         setIsValidate(false);
       }, 2000);
-      return
+      return;
     }
 
-    await addDoc(collection(db, "todos"), {
-      text: input,
-      completed: false,
-    });
-    setInput("");
+    if (!selectedTodo?.onEdit) {
+      await addDoc(collection(db, "todos"), {
+        text: input,
+        completed: false,
+        onEdit: false,
+      });
+    } else {
+      await updateDoc(doc(db, 'todos', selectedTodo?.id), {
+        text: input,
+        onEdit: false,
+      })
+      setSelectedTodo(prev => ({
+        ...prev,
+        onEdit: false
+      }))
+    }
+    setInput('') 
   };
 
   // read todo from firebase
@@ -55,16 +85,18 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  // delete todo
+  const handleDelete = async (todo) => {
+    await deleteDoc(doc(db, "todos", todo.id));
+
+    setTodos((prev) => prev.filter((t) => t.id !== todo.id));
+  };
+
   // update todo in firebase
   const handleToggle = async (todo) => {
     await updateDoc(doc(db, "todos", todo.id), {
       completed: !todo.completed,
     });
-  };
-
-  // delete todo
-  const handleDelete = async (todo) => {
-    await deleteDoc(doc(db, "todos", todo.id));
   };
 
   const style = {
@@ -82,27 +114,41 @@ export default function Home() {
       <div className={style.container}>
         <h3 className={style.heading}>Todo App</h3>
         <form onSubmit={handleSubmit} className={style.form}>
-          <input
-            onChange={(e) => setInput(e.target.value)}
-            value={input}
-            className={style.input}
-          />
+          {selectedTodo?.onEdit ? (
+            <input
+              onChange={(e) => setInput(e.target.value)}
+              ref={editInput}
+              value={input}
+              className={style.input}
+              placeholder={`Edit "${selectedTodo.text}" to new todo..`}
+            />
+          ) : (
+            <input
+              onChange={(e) => setInput(e.target.value)}
+              value={input}
+              className={style.input}
+              placeholder="Add todo"
+            />
+          )}
           <button className={style.button}>
             <AiOutlinePlus size={30} />
           </button>
         </form>
         {isValidate && <ValidationMsg />}
         <ul>
-          {todos.map(todo => (
+          {todos.map((todo) => (
             <Todo
               key={todo.id}
               todo={todo}
               handleToggle={handleToggle}
               handleDelete={handleDelete}
+              handleEdit={handleEdit}
             />
           ))}
         </ul>
-        {todos.length < 1 ? null : (
+        {todos.length < 1 ? (
+          <p className={style.count}>You have no todos</p>
+        ) : (
           <p className={style.count}>You have {todos.length} todos</p>
         )}
       </div>
