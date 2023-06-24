@@ -161,19 +161,19 @@ export default function Home() {
         <div className="flex justify-center space-x-3">
           <button
             onClick={(e) => setCases(e.target.textContent)}
-            className="btn"
+            className={`btn ${cases==='All' && 'active-btn' }`}
           >
             All
           </button>
           <button
             onClick={(e) => setCases(e.target.textContent)}
-            className="btn"
+            className={`btn ${cases==='Active' && 'active-btn' }`}
           >
             Active
           </button>
           <button
             onClick={(e) => setCases(e.target.textContent)}
-            className="btn"
+            className={`btn ${cases==='Completed' && 'active-btn' }`}
           >
             Completed
           </button>
