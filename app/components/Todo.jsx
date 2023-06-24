@@ -13,7 +13,7 @@ const style = {
   btnContainer: `flex items-center space-x-1`,
 };
 
-function Todo({ todo, handleToggle, handleDelete, handleEdit, onEdit }) {
+function Todo({ todo, handleToggle, handleDelete, handleEdit }) {
   return (
     <li className={todo.completed ? style.liComplete : style.li}>
       <div className={style.row}>
