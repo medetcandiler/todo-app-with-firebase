@@ -108,10 +108,19 @@ export default function Home() {
   //
   const counter = () => {
     if(cases === 'All'){
+      if(filtered.length === 0){
+        return <p className={style.count}>You have no todo</p>
+      }
       return <p className={style.count}>You have {filtered.length} todo{filtered.length > 1 && 's'}</p>
     } else if(cases ==='Active'){
+      if(filtered.length === 0){
+        return <p className={style.count}>You have no active todo</p>
+      }
       return <p className={style.count}>You have {filtered.length} active todo{filtered.length > 1 && 's'}</p>
     } else if(cases === 'Completed'){
+      if(filtered.length === 0){
+        return <p className={style.count}>You have no completed todo</p>
+      }
       return <p className={style.count}>You have {filtered.length} completed todo{filtered.length > 1 && 's'} </p>
     }
   }
